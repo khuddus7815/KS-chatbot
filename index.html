@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KS Hacker Chat</title>
+    <title>KS Hacker Terminal</title>
     <style>
         * {
             margin: 0;
@@ -36,7 +36,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: all 0.3s ease;
             position: relative;
         }
 
@@ -333,12 +332,41 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+
+        /* Connection status indicator */
+        .connection-status {
+            position: absolute;
+            top: 12px;
+            right: 70px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
     <div class="chatbot-container" id="chatbot">
         <div class="chatbot-header">
-            <div class="chatbot-title glitch" data-text="KS_HACKER_CHAT_v1.3.37">KS_HACKER_CHAT_v1.3.37</div>
+            <div class="chatbot-title glitch" data-text="KS_HACKER_TERMINAL_v1.3.37">KS_HACKER_TERMINAL_v1.3.37</div>
+            <div class="connection-status">
+                <div class="status-indicator"></div>
+                <span>ENCRYPTED</span>
+            </div>
             <div class="chatbot-controls">
                 <button class="control-btn minimize-btn" id="minimizeBtn">−</button>
                 <button class="control-btn close-btn" id="closeBtn">×</button>
@@ -346,7 +374,7 @@
         </div>
         <div class="chatbot-messages" id="chatMessages">
             <div class="message bot-message">
-                > Initializing KS Hacker Chat Interface...<br>
+                > Initializing KS Hacker Terminal...<br>
                 > Bypassing firewalls...<br>
                 > Establishing secure connection...<br><br>
                 <span style="color: #00ff41">[SYSTEM]</span> Connection established. Welcome, <span style="text-decoration: underline">USER</span>.<br>
@@ -380,11 +408,11 @@
             let conversationHistory = [
                 {
                     role: "system",
-                    content: "You are a hacker-style AI assistant. Respond in short, technical messages with hacker khuddus. Use code-like formatting. Be mysterious but helpful."
+                    content: "You are a hacker-style AI assistant. Respond in short, technical messages with hacker jargon. Use code-like formatting. Be mysterious but helpful. Format responses with > at the start of each line to look like terminal output. Include [SYSTEM], [WARNING], or [ERROR] tags when appropriate."
                 },
                 {
                     role: "assistant",
-                    content: "> Initializing KS Hacker Chat Interface...\n> Bypassing firewalls...\n> Establishing secure connection...\n\n[SYSTEM] Connection established. Welcome, USER.\nHow can I assist you today?"
+                    content: "> Initializing KS Hacker Terminal...\n> Bypassing firewalls...\n> Establishing secure connection...\n\n[SYSTEM] Connection established. Welcome, USER.\nHow can I assist you today?"
                 }
             ];
 
@@ -471,7 +499,7 @@
                     let botResponse = data.choices[0].message.content;
 
                     // Format response to look more "hacker-like"
-                    botResponse = botResponse.replace(/\n/g, '<br>> ');
+                    botResponse = botResponse.replace(/\n/g, '\n> ');
                     botResponse = "> " + botResponse;
 
                     // Add bot response to conversation history
@@ -486,14 +514,36 @@
                 } catch (error) {
                     console.error("Error calling API:", error);
                     removeTypingIndicator();
-                    addMessage("[SYSTEM_ERROR] Connection interrupted. Attempting to reestablish...", 'bot');
-                    setTimeout(() => {
-                        addMessage("[SYSTEM] Connection restored. Please repeat your request.", 'bot');
-                    }, 1500);
+                    
+                    // Fallback responses when API fails
+                    const fallbackResponses = [
+                        "> [SYSTEM] Processing local response cache...\n> Here's what I found:\n> " + getFallbackResponse(message),
+                        "> [WARNING] Connection unstable\n> Switching to local intelligence module\n> " + getFallbackResponse(message),
+                        "> [NOTICE] Using cached response protocol\n> " + getFallbackResponse(message)
+                    ];
+                    
+                    const fallbackResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+                    addMessage(fallbackResponse, 'bot');
                 } finally {
                     userInput.disabled = false;
                     sendBtn.disabled = false;
                     userInput.focus();
+                }
+            }
+
+            function getFallbackResponse(message) {
+                const lowerMsg = message.toLowerCase();
+                
+                if (/hello|hi|hey/.test(lowerMsg)) {
+                    return "Greetings, USER. Systems operational. How may I assist?";
+                } else if (/help|support/.test(lowerMsg)) {
+                    return "[HELP] Available commands: info, query, analyze, decrypt";
+                } else if (/time|date/.test(lowerMsg)) {
+                    return `[SYSTEM_TIME] ${new Date().toLocaleString()}`;
+                } else if (/who are you/.test(lowerMsg)) {
+                    return "[IDENTITY] KS Hacker Terminal v1.3.37 - AI-assisted interface";
+                } else {
+                    return "Command recognized but response unavailable. Please rephrase or try another query.";
                 }
             }
 
@@ -518,7 +568,7 @@
                 typingDiv.classList.add('typing-indicator');
                 typingDiv.id = 'typingIndicator';
                 typingDiv.innerHTML = `
-                    [SYSTEM] Decrypting response` + 
+                    [SYSTEM] Processing request` + 
                     `<div class="typing-dot"></div>
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>`;
@@ -540,6 +590,9 @@
             setTimeout(() => {
                 addMessage("[SYSTEM] All systems operational. Firewall active.", 'bot');
             }, 2000);
+            setTimeout(() => {
+                addMessage("[SYSTEM] Encryption protocols enabled.", 'bot');
+            }, 3000);
         });
     </script>
 </body>
