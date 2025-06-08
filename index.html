@@ -3,48 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KS Chatbot</title>
+    <title>KS Hacker Chat</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', monospace;
         }
 
         body {
-            background-color: #f5f7fa;
+            background-color: #0a0a0a;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            background-image: 
+                radial-gradient(#0d2e0d 1px, transparent 1px),
+                radial-gradient(#0d2e0d 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
         }
 
         .chatbot-container {
-            width: 400px;
-            height: 600px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            height: 650px;
+            background-color: rgba(0, 10, 0, 0.85);
+            border-radius: 0;
+            border: 1px solid #00ff41;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chatbot-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+            background-size: 10px 10px;
+            pointer-events: none;
         }
 
         .chatbot-header {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-            padding: 16px 20px;
+            background-color: #001a00;
+            color: #00ff41;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid #00ff41;
+            text-shadow: 0 0 5px #00ff41;
         }
 
         .chatbot-title {
             font-weight: 600;
-            font-size: 18px;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .chatbot-title::before {
+            content: "> ";
         }
 
         .chatbot-controls {
@@ -53,110 +81,135 @@
         }
 
         .control-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            color: white;
+            background: rgba(0, 255, 65, 0.2);
+            border: 1px solid #00ff41;
+            width: 22px;
+            height: 22px;
+            border-radius: 0;
+            color: #00ff41;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff41;
         }
 
         .control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 255, 65, 0.4);
+            box-shadow: 0 0 10px #00ff41;
         }
 
         .chatbot-messages {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
-            background-color: #f9f9f9;
+            background-color: rgba(0, 5, 0, 0.7);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 18px;
+            max-width: 85%;
+            padding: 10px 15px;
+            border-radius: 0;
             font-size: 14px;
             line-height: 1.4;
             position: relative;
+            border-left: 2px solid #00ff41;
+            animation: textAppear 0.5s ease-out;
+        }
+
+        @keyframes textAppear {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .user-message {
             align-self: flex-end;
-            background-color: #6e8efb;
-            color: white;
-            border-bottom-right-radius: 4px;
+            background-color: rgba(0, 40, 0, 0.7);
+            color: #00ff41;
+            border-left: none;
+            border-right: 2px solid #00ff41;
         }
 
         .bot-message {
             align-self: flex-start;
-            background-color: white;
-            color: #333;
-            border: 1px solid #e0e0e0;
-            border-bottom-left-radius: 4px;
+            background-color: rgba(0, 20, 0, 0.5);
+            color: #00ff41;
         }
 
         .chatbot-input-container {
-            padding: 16px;
-            border-top: 1px solid #eee;
-            background-color: white;
+            padding: 12px;
+            border-top: 1px solid #00ff41;
+            background-color: #001000;
             display: flex;
             gap: 10px;
+            align-items: center;
+        }
+
+        .input-prompt {
+            color: #00ff41;
+            font-weight: bold;
         }
 
         .chatbot-input {
             flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
+            padding: 10px 15px;
+            border: 1px solid #007700;
+            border-radius: 0;
             outline: none;
             font-size: 14px;
-            transition: border 0.2s;
+            transition: all 0.3s;
+            background-color: rgba(0, 15, 0, 0.8);
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
         }
 
         .chatbot-input:focus {
-            border-color: #a777e3;
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .chatbot-input::placeholder {
+            color: #007700;
+            font-style: italic;
         }
 
         .send-btn {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-            border: none;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+            background-color: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            width: 40px;
+            height: 40px;
+            border-radius: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: all 0.2s;
+            text-shadow: 0 0 5px #00ff41;
         }
 
         .send-btn:hover {
-            transform: scale(1.05);
-            opacity: 0.9;
+            background-color: rgba(0, 255, 65, 0.4);
+            box-shadow: 0 0 10px #00ff41;
         }
 
         .send-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
 
         .minimized {
-            height: 60px;
+            height: 50px;
             overflow: hidden;
         }
 
         .timestamp {
             font-size: 10px;
-            color: #999;
+            color: #007700;
             margin-top: 4px;
             text-align: right;
         }
@@ -166,19 +219,21 @@
             align-items: center;
             gap: 4px;
             padding: 8px 16px;
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 18px;
+            background-color: rgba(0, 20, 0, 0.5);
+            border: 1px solid #007700;
+            border-radius: 0;
             align-self: flex-start;
             width: fit-content;
+            color: #00ff41;
         }
 
         .typing-dot {
             width: 8px;
             height: 8px;
-            background-color: #a777e3;
+            background-color: #00ff41;
             border-radius: 50%;
             animation: typingAnimation 1.4s infinite ease-in-out;
+            box-shadow: 0 0 5px #00ff41;
         }
 
         .typing-dot:nth-child(1) {
@@ -194,8 +249,8 @@
         }
 
         @keyframes typingAnimation {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-5px); }
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+            30% { transform: translateY(-3px); opacity: 1; }
         }
 
         /* Scrollbar styling */
@@ -204,23 +259,86 @@
         }
 
         .chatbot-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: rgba(0, 20, 0, 0.3);
         }
 
         .chatbot-messages::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
+            background: #007700;
+            border-radius: 0;
         }
 
         .chatbot-messages::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+            background: #00aa00;
+        }
+
+        /* Glitch effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 10, 0, 0.8);
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(61px, 9999px, 52px, 0); }
+            20% { clip: rect(33px, 9999px, 14px, 0); }
+            40% { clip: rect(43px, 9999px, 37px, 0); }
+            60% { clip: rect(23px, 9999px, 68px, 0); }
+            80% { clip: rect(54px, 9999px, 12px, 0); }
+            100% { clip: rect(9px, 9999px, 98px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(25px, 9999px, 99px, 0); }
+            20% { clip: rect(54px, 9999px, 33px, 0); }
+            40% { clip: rect(28px, 9999px, 87px, 0); }
+            60% { clip: rect(45px, 9999px, 22px, 0); }
+            80% { clip: rect(38px, 9999px, 74px, 0); }
+            100% { clip: rect(12px, 9999px, 45px, 0); }
+        }
+
+        /* Terminal cursor blink */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: #00ff41;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
 <body>
     <div class="chatbot-container" id="chatbot">
         <div class="chatbot-header">
-            <div class="chatbot-title">KS Chatbot</div>
+            <div class="chatbot-title glitch" data-text="KS_HACKER_CHAT_v1.3.37">KS_HACKER_CHAT_v1.3.37</div>
             <div class="chatbot-controls">
                 <button class="control-btn minimize-btn" id="minimizeBtn">−</button>
                 <button class="control-btn close-btn" id="closeBtn">×</button>
@@ -228,17 +346,19 @@
         </div>
         <div class="chatbot-messages" id="chatMessages">
             <div class="message bot-message">
-                Hello! I'm your AI assistant powered by Khuddus shaik. How can I help you today?
-                <div class="timestamp">Just now</div>
+                > Initializing KS Hacker Chat Interface...<br>
+                > Bypassing firewalls...<br>
+                > Establishing secure connection...<br><br>
+                <span style="color: #00ff41">[SYSTEM]</span> Connection established. Welcome, <span style="text-decoration: underline">USER</span>.<br>
+                How can I assist you today?<span class="cursor"></span>
+                <div class="timestamp">[SYSTEM_TIME]</div>
             </div>
         </div>
         <div class="chatbot-input-container">
-            <input type="text" class="chatbot-input" id="userInput" placeholder="Type your message here..." autocomplete="off">
+            <span class="input-prompt">></span>
+            <input type="text" class="chatbot-input" id="userInput" placeholder="Enter command..." autocomplete="off">
             <button class="send-btn" id="sendBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                [EXECUTE]
             </button>
         </div>
     </div>
@@ -260,11 +380,11 @@
             let conversationHistory = [
                 {
                     role: "system",
-                    content: "You are a helpful AI assistant. Be friendly, concise, and helpful."
+                    content: "You are a hacker-style AI assistant. Respond in short, technical messages with hacker jargon. Use code-like formatting. Be mysterious but helpful."
                 },
                 {
                     role: "assistant",
-                    content: "Hello! I'm your AI assistant powered by khuddus shaik. How can I help you today?"
+                    content: "> Initializing KS Hacker Chat Interface...\n> Bypassing firewalls...\n> Establishing secure connection...\n\n[SYSTEM] Connection established. Welcome, USER.\nHow can I assist you today?"
                 }
             ];
 
@@ -276,12 +396,16 @@
 
             // Close functionality
             closeBtn.addEventListener('click', function() {
-                chatbot.style.display = 'none';
+                addMessage("[SYSTEM] Terminating connection...", 'bot');
                 setTimeout(() => {
-                    if (confirm('Do you want to reopen the chatbot?')) {
-                        chatbot.style.display = 'flex';
-                    }
-                }, 300);
+                    chatbot.style.display = 'none';
+                    setTimeout(() => {
+                        if (confirm('[SYSTEM] Reinitialize connection?')) {
+                            chatbot.style.display = 'flex';
+                            addMessage("[SYSTEM] Connection reestablished. Welcome back.", 'bot');
+                        }
+                    }, 300);
+                }, 500);
             });
 
             // Send message on button click
@@ -294,12 +418,22 @@
                 }
             });
 
+            // Add hacker-like typing effect
+            userInput.addEventListener('input', function() {
+                if (Math.random() < 0.1) {
+                    this.value = this.value + String.fromCharCode(Math.floor(Math.random() * 94) + 33);
+                    setTimeout(() => {
+                        this.value = this.value.slice(0, -1);
+                    }, 100);
+                }
+            });
+
             async function sendMessage() {
                 const message = userInput.value.trim();
                 if (message === '') return;
 
                 // Add user message to chat
-                addMessage(message, 'user');
+                addMessage("> " + message, 'user');
                 userInput.value = '';
                 userInput.disabled = true;
                 sendBtn.disabled = true;
@@ -320,7 +454,7 @@
                         headers: {
                             "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
                             "HTTP-Referer": window.location.href,
-                            "X-Title": "AI Chatbot",
+                            "X-Title": "Hacker Chatbot",
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
@@ -334,7 +468,11 @@
                     }
 
                     const data = await response.json();
-                    const botResponse = data.choices[0].message.content;
+                    let botResponse = data.choices[0].message.content;
+
+                    // Format response to look more "hacker-like"
+                    botResponse = botResponse.replace(/\n/g, '<br>> ');
+                    botResponse = "> " + botResponse;
 
                     // Add bot response to conversation history
                     conversationHistory.push({
@@ -346,9 +484,12 @@
                     removeTypingIndicator();
                     addMessage(botResponse, 'bot');
                 } catch (error) {
-                    console.error("Error calling  API:", error);
+                    console.error("Error calling API:", error);
                     removeTypingIndicator();
-                    addMessage("Sorry, I encountered an error. Please try again later.", 'bot');
+                    addMessage("[SYSTEM_ERROR] Connection interrupted. Attempting to reestablish...", 'bot');
+                    setTimeout(() => {
+                        addMessage("[SYSTEM] Connection restored. Please repeat your request.", 'bot');
+                    }, 1500);
                 } finally {
                     userInput.disabled = false;
                     sendBtn.disabled = false;
@@ -364,8 +505,8 @@
                 const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
                 messageDiv.innerHTML = `
-                    ${text}
-                    <div class="timestamp">${timestamp}</div>
+                    ${text.replace(/\n/g, '<br>')}
+                    <div class="timestamp">[${timestamp}]</div>
                 `;
                 
                 chatMessages.appendChild(messageDiv);
@@ -377,10 +518,10 @@
                 typingDiv.classList.add('typing-indicator');
                 typingDiv.id = 'typingIndicator';
                 typingDiv.innerHTML = `
+                    [SYSTEM] Decrypting response` + 
+                    `<div class="typing-dot"></div>
                     <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                `;
+                    <div class="typing-dot"></div>`;
                 chatMessages.appendChild(typingDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
@@ -391,6 +532,14 @@
                     typingIndicator.remove();
                 }
             }
+
+            // Add some initial "system" messages for effect
+            setTimeout(() => {
+                addMessage("[SYSTEM] Scanning for vulnerabilities...", 'bot');
+            }, 1000);
+            setTimeout(() => {
+                addMessage("[SYSTEM] All systems operational. Firewall active.", 'bot');
+            }, 2000);
         });
     </script>
 </body>
