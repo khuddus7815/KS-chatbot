@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KS Hacker Terminal</title>
+    <title>KS Hacker Terminal v2.0</title>
     <style>
         * {
             margin: 0;
@@ -74,6 +74,36 @@
             content: "> ";
         }
 
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.connecting {
+            background-color: #ffff00;
+            animation: pulse 1s infinite;
+        }
+
+        .status-indicator.error {
+            background-color: #ff0000;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .chatbot-controls {
             display: flex;
             gap: 12px;
@@ -140,6 +170,13 @@
             color: #00ff41;
         }
 
+        .error-message {
+            align-self: flex-start;
+            background-color: rgba(40, 0, 0, 0.5);
+            color: #ff5555;
+            border-left: 2px solid #ff0000;
+        }
+
         .chatbot-input-container {
             padding: 12px;
             border-top: 1px solid #00ff41;
@@ -197,20 +234,9 @@
             box-shadow: 0 0 10px #00ff41;
         }
 
-        .send-btn:active {
-            transform: scale(0.95);
-        }
-
-        .minimized {
-            height: 50px;
-            overflow: hidden;
-        }
-
-        .timestamp {
-            font-size: 10px;
-            color: #007700;
-            margin-top: 4px;
-            text-align: right;
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .typing-indicator {
@@ -252,7 +278,6 @@
             30% { transform: translateY(-3px); opacity: 1; }
         }
 
-        /* Scrollbar styling */
         .chatbot-messages::-webkit-scrollbar {
             width: 6px;
         }
@@ -270,102 +295,30 @@
             background: #00aa00;
         }
 
-        /* Glitch effect */
-        .glitch {
-            position: relative;
-        }
-
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 10, 0, 0.8);
-        }
-
-        .glitch::before {
-            left: 2px;
-            text-shadow: -2px 0 #ff00ff;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim-1 2s infinite linear alternate-reverse;
-        }
-
-        .glitch::after {
-            left: -2px;
-            text-shadow: -2px 0 #00ffff;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim-2 2s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-anim-1 {
-            0% { clip: rect(61px, 9999px, 52px, 0); }
-            20% { clip: rect(33px, 9999px, 14px, 0); }
-            40% { clip: rect(43px, 9999px, 37px, 0); }
-            60% { clip: rect(23px, 9999px, 68px, 0); }
-            80% { clip: rect(54px, 9999px, 12px, 0); }
-            100% { clip: rect(9px, 9999px, 98px, 0); }
-        }
-
-        @keyframes glitch-anim-2 {
-            0% { clip: rect(25px, 9999px, 99px, 0); }
-            20% { clip: rect(54px, 9999px, 33px, 0); }
-            40% { clip: rect(28px, 9999px, 87px, 0); }
-            60% { clip: rect(45px, 9999px, 22px, 0); }
-            80% { clip: rect(38px, 9999px, 74px, 0); }
-            100% { clip: rect(12px, 9999px, 45px, 0); }
-        }
-
-        /* Terminal cursor blink */
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 16px;
-            background-color: #00ff41;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-            margin-left: 2px;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Connection status indicator */
-        .connection-status {
-            position: absolute;
-            top: 12px;
-            right: 70px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .reconnect-btn {
+            background-color: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            padding: 6px 10px;
+            border-radius: 0;
+            cursor: pointer;
+            margin-top: 8px;
             font-size: 12px;
+            transition: all 0.2s;
         }
 
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #00ff41;
-            box-shadow: 0 0 5px #00ff41;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .reconnect-btn:hover {
+            background-color: rgba(0, 255, 65, 0.4);
         }
     </style>
 </head>
 <body>
     <div class="chatbot-container" id="chatbot">
         <div class="chatbot-header">
-            <div class="chatbot-title glitch" data-text="KS_HACKER_TERMINAL_v1.3.37">KS_HACKER_TERMINAL_v1.3.37</div>
+            <div class="chatbot-title">KS_HACKER_TERMINAL_v2.0</div>
             <div class="connection-status">
-                <div class="status-indicator"></div>
-                <span>ENCRYPTED</span>
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">CONNECTING</span>
             </div>
             <div class="chatbot-controls">
                 <button class="control-btn minimize-btn" id="minimizeBtn">−</button>
@@ -374,18 +327,16 @@
         </div>
         <div class="chatbot-messages" id="chatMessages">
             <div class="message bot-message">
-                > Initializing KS Hacker Terminal...<br>
-                > Bypassing firewalls...<br>
-                > Establishing secure connection...<br><br>
-                <span style="color: #00ff41">[SYSTEM]</span> Connection established. Welcome, <span style="text-decoration: underline">USER</span>.<br>
-                How can I assist you today?<span class="cursor"></span>
-                <div class="timestamp">[SYSTEM_TIME]</div>
+                > Booting KS Hacker Terminal v2.0...<br>
+                > Initializing secure connection protocols...<br>
+                > Loading neural network modules...<br><br>
+                <span style="color: #00ff41">[SYSTEM]</span> Establishing connection to DeepSeek API<span class="cursor"></span>
             </div>
         </div>
         <div class="chatbot-input-container">
             <span class="input-prompt">></span>
-            <input type="text" class="chatbot-input" id="userInput" placeholder="Enter command..." autocomplete="off">
-            <button class="send-btn" id="sendBtn">
+            <input type="text" class="chatbot-input" id="userInput" placeholder="Enter command..." autocomplete="off" disabled>
+            <button class="send-btn" id="sendBtn" disabled>
                 [EXECUTE]
             </button>
         </div>
@@ -399,200 +350,262 @@
             const sendBtn = document.getElementById('sendBtn');
             const minimizeBtn = document.getElementById('minimizeBtn');
             const closeBtn = document.getElementById('closeBtn');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
 
-            // Your OpenRouter API key
+            // Configuration
             const OPENROUTER_API_KEY = "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";
             const MODEL = "deepseek/deepseek-chat:free";
+            const API_TIMEOUT = 10000; // 10 seconds
+            const MAX_RETRIES = 3;
 
-            // Conversation history
+            // State
+            let isConnected = false;
+            let retryCount = 0;
             let conversationHistory = [
                 {
                     role: "system",
-                    content: "You are a hacker-style AI assistant. Respond in short, technical messages with hacker khuddus. Use code-like formatting. Be mysterious but helpful. Format responses with > at the start of each line to look like terminal output. Include [SYSTEM], [WARNING], or [ERROR] tags when appropriate."
-                },
-                {
-                    role: "assistant",
-                    content: "> Initializing KS Hacker Terminal...\n> Bypassing firewalls...\n> Establishing secure connection...\n\n[SYSTEM] Connection established. Welcome, USER.\nHow can I assist you today?"
+                    content: "You are a hacker-style AI assistant. Respond in short, technical messages with hacker aesthetic. Use code-like formatting with > at line starts. Include [SYSTEM], [WARNING], or [ERROR] tags when appropriate. Be concise but helpful."
                 }
             ];
 
-            // Minimize functionality
-            minimizeBtn.addEventListener('click', function() {
-                chatbot.classList.toggle('minimized');
-                minimizeBtn.textContent = chatbot.classList.contains('minimized') ? '+' : '−';
+            // Initialize
+            testConnection();
+
+            // Event Listeners
+            minimizeBtn.addEventListener('click', toggleMinimize);
+            closeBtn.addEventListener('click', closeTerminal);
+            sendBtn.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
             });
 
-            // Close functionality
-            closeBtn.addEventListener('click', function() {
+            // Functions
+            function toggleMinimize() {
+                chatbot.classList.toggle('minimized');
+                minimizeBtn.textContent = chatbot.classList.contains('minimized') ? '+' : '−';
+            }
+
+            function closeTerminal() {
                 addMessage("[SYSTEM] Terminating connection...", 'bot');
                 setTimeout(() => {
                     chatbot.style.display = 'none';
                     setTimeout(() => {
                         if (confirm('[SYSTEM] Reinitialize connection?')) {
                             chatbot.style.display = 'flex';
-                            addMessage("[SYSTEM] Connection reestablished. Welcome back.", 'bot');
+                            addMessage("[SYSTEM] Connection reestablished.", 'bot');
+                            testConnection();
                         }
                     }, 300);
                 }, 500);
-            });
+            }
 
-            // Send message on button click
-            sendBtn.addEventListener('click', sendMessage);
+            async function testConnection() {
+                updateStatus('connecting', "CONNECTING...");
+                userInput.disabled = true;
+                sendBtn.disabled = true;
 
-            // Send message on Enter key
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
+                try {
+                    const response = await fetchWithTimeout("https://openrouter.ai/api/v1/models", {
+                        method: "GET",
+                        headers: getHeaders()
+                    }, 5000);
+
+                    if (response.ok) {
+                        updateStatus('connected', "CONNECTED");
+                        addMessage("[SYSTEM] Connection established. Ready for commands.", 'bot');
+                        isConnected = true;
+                        retryCount = 0;
+                        userInput.disabled = false;
+                        sendBtn.disabled = false;
+                        userInput.focus();
+                    } else {
+                        throw new Error(`Status ${response.status}`);
+                    }
+                } catch (error) {
+                    handleConnectionError(error);
                 }
-            });
-
-            // Add hacker-like typing effect
-            userInput.addEventListener('input', function() {
-                if (Math.random() < 0.1) {
-                    this.value = this.value + String.fromCharCode(Math.floor(Math.random() * 94) + 33);
-                    setTimeout(() => {
-                        this.value = this.value.slice(0, -1);
-                    }, 100);
-                }
-            });
+            }
 
             async function sendMessage() {
                 const message = userInput.value.trim();
-                if (message === '') return;
+                if (message === '' || !isConnected) return;
 
-                // Add user message to chat
+                // Add user message
                 addMessage("> " + message, 'user');
                 userInput.value = '';
                 userInput.disabled = true;
                 sendBtn.disabled = true;
 
-                // Add user message to conversation history
-                conversationHistory.push({
-                    role: "user",
-                    content: message
-                });
+                // Add to history
+                conversationHistory.push({ role: "user", content: message });
 
-                // Show typing indicator
+                // Show typing
                 showTypingIndicator();
 
                 try {
-                    // Call OpenRouter API
-                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                            "HTTP-Referer": window.location.href,
-                            "X-Title": "Hacker Chatbot",
-                            "Content-Type": "application/json"
+                    const response = await fetchWithTimeout(
+                        "https://openrouter.ai/api/v1/chat/completions",
+                        {
+                            method: "POST",
+                            headers: getHeaders(),
+                            body: JSON.stringify({
+                                model: MODEL,
+                                messages: conversationHistory,
+                                temperature: 0.7,
+                                max_tokens: 1000
+                            })
                         },
-                        body: JSON.stringify({
-                            "model": MODEL,
-                            "messages": conversationHistory
-                        })
-                    });
+                        API_TIMEOUT
+                    );
 
                     if (!response.ok) {
-                        throw new Error(`API request failed with status ${response.status}`);
+                        throw new Error(`API error: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    let botResponse = data.choices[0].message.content;
+                    let botResponse = formatResponse(data.choices[0].message.content);
 
-                    // Format response to look more "hacker-like"
-                    botResponse = botResponse.replace(/\n/g, '\n> ');
-                    botResponse = "> " + botResponse;
-
-                    // Add bot response to conversation history
-                    conversationHistory.push({
-                        role: "assistant",
-                        content: botResponse
-                    });
-
-                    // Remove typing indicator and add bot message
+                    // Add to history and display
+                    conversationHistory.push({ role: "assistant", content: botResponse });
                     removeTypingIndicator();
                     addMessage(botResponse, 'bot');
+
                 } catch (error) {
-                    console.error("Error calling API:", error);
+                    console.error("API Error:", error);
                     removeTypingIndicator();
-                    
-                    // Fallback responses when API fails
-                    const fallbackResponses = [
-                        "> [SYSTEM] Processing local response cache...\n> Here's what I found:\n> " + getFallbackResponse(message),
-                        "> [WARNING] Connection unstable\n> Switching to local intelligence module\n> " + getFallbackResponse(message),
-                        "> [NOTICE] Using cached response protocol\n> " + getFallbackResponse(message)
-                    ];
-                    
-                    const fallbackResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-                    addMessage(fallbackResponse, 'bot');
+                    handleAPIError(error, message);
                 } finally {
-                    userInput.disabled = false;
-                    sendBtn.disabled = false;
-                    userInput.focus();
+                    if (isConnected) {
+                        userInput.disabled = false;
+                        sendBtn.disabled = false;
+                        userInput.focus();
+                    }
                 }
+            }
+
+            function handleConnectionError(error) {
+                retryCount++;
+                isConnected = false;
+                updateStatus('error', "DISCONNECTED");
+                
+                const errorMessage = `[ERROR] Connection failed: ${error.message}`;
+                addMessage(errorMessage, 'error');
+
+                if (retryCount < MAX_RETRIES) {
+                    const retryMessage = document.createElement('div');
+                    retryMessage.className = 'message bot-message';
+                    retryMessage.innerHTML = `
+                        > [SYSTEM] Attempting reconnect (${retryCount}/${MAX_RETRIES})<br>
+                        <button class="reconnect-btn" id="reconnectBtn">RETRY CONNECTION</button>
+                    `;
+                    chatMessages.appendChild(retryMessage);
+                    document.getElementById('reconnectBtn').addEventListener('click', testConnection);
+                } else {
+                    addMessage("> [ERROR] Maximum connection attempts reached. Please check your API key and network.", 'error');
+                }
+            }
+
+            function handleAPIError(error, userMessage) {
+                isConnected = false;
+                updateStatus('error', "API ERROR");
+                
+                const errorType = error.message.includes('timeout') ? 'Timeout' : 'API Error';
+                addMessage(`> [ERROR] ${errorType}: ${error.message}`, 'error');
+                
+                // Add reconnect option
+                const reconnectMessage = document.createElement('div');
+                reconnectMessage.className = 'message bot-message';
+                reconnectMessage.innerHTML = `
+                    > [SYSTEM] Connection lost<br>
+                    <button class="reconnect-btn" id="reconnectBtn">RECONNECT</button>
+                `;
+                chatMessages.appendChild(reconnectMessage);
+                document.getElementById('reconnectBtn').addEventListener('click', testConnection);
+                
+                // Provide fallback response
+                addMessage(getFallbackResponse(userMessage), 'bot');
+            }
+
+            function getHeaders() {
+                return {
+                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                    "HTTP-Referer": window.location.href,
+                    "X-Title": "KS Hacker Terminal",
+                    "Content-Type": "application/json"
+                };
+            }
+
+            function formatResponse(text) {
+                return "> " + text.replace(/\n/g, '\n> ');
             }
 
             function getFallbackResponse(message) {
                 const lowerMsg = message.toLowerCase();
+                const responses = {
+                    greeting: "[SYSTEM] Greetings USER. API unavailable. Try again later.",
+                    help: "[HELP] Local commands:\n> - clear\n> - status\n> - help",
+                    time: `[SYSTEM_TIME] ${new Date().toLocaleString()}`,
+                    default: "[WARNING] API unreachable. Check connection or API key."
+                };
                 
-                if (/hello|hi|hey/.test(lowerMsg)) {
-                    return "Greetings, USER. Systems operational. How may I assist?";
-                } else if (/help|support/.test(lowerMsg)) {
-                    return "[HELP] Available commands: info, query, analyze, decrypt";
-                } else if (/time|date/.test(lowerMsg)) {
-                    return `[SYSTEM_TIME] ${new Date().toLocaleString()}`;
-                } else if (/who are you/.test(lowerMsg)) {
-                    return "[IDENTITY] KS Hacker Terminal v1.3.37 - AI-assisted interface";
-                } else {
-                    return "Command recognized but response unavailable. Please rephrase or try another query.";
+                if (/hello|hi|hey/.test(lowerMsg)) return responses.greeting;
+                if (/help|support/.test(lowerMsg)) return responses.help;
+                if (/time|date/.test(lowerMsg)) return responses.time;
+                return responses.default;
+            }
+
+            function updateStatus(status, text) {
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = text;
+                
+                switch(status) {
+                    case 'connected':
+                        statusIndicator.classList.add('connected');
+                        break;
+                    case 'connecting':
+                        statusIndicator.classList.add('connecting');
+                        break;
+                    case 'error':
+                        statusIndicator.classList.add('error');
+                        break;
                 }
             }
 
-            function addMessage(text, sender) {
+            function addMessage(text, type) {
                 const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message');
-                messageDiv.classList.add(sender + '-message');
-                
-                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                messageDiv.innerHTML = `
-                    ${text.replace(/\n/g, '<br>')}
-                    <div class="timestamp">[${timestamp}]</div>
-                `;
-                
+                messageDiv.classList.add('message', `${type}-message`);
+                messageDiv.innerHTML = text.replace(/\n/g, '<br>');
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
             function showTypingIndicator() {
                 const typingDiv = document.createElement('div');
-                typingDiv.classList.add('typing-indicator');
+                typingDiv.className = 'typing-indicator';
                 typingDiv.id = 'typingIndicator';
                 typingDiv.innerHTML = `
-                    [SYSTEM] Processing request` + 
-                    `<div class="typing-dot"></div>
+                    [SYSTEM] Processing
                     <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>`;
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
                 chatMessages.appendChild(typingDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
             function removeTypingIndicator() {
-                const typingIndicator = document.getElementById('typingIndicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) indicator.remove();
             }
 
-            // Add some initial "system" messages for effect
-            setTimeout(() => {
-                addMessage("[SYSTEM] Scanning for vulnerabilities...", 'bot');
-            }, 1000);
-            setTimeout(() => {
-                addMessage("[SYSTEM] All systems operational. Firewall active.", 'bot');
-            }, 2000);
-            setTimeout(() => {
-                addMessage("[SYSTEM] Encryption protocols enabled.", 'bot');
-            }, 3000);
+            function fetchWithTimeout(url, options, timeout) {
+                return Promise.race([
+                    fetch(url, options),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Request timeout')), timeout)
+                ]);
+            }
         });
     </script>
 </body>
